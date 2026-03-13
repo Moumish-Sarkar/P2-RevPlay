@@ -202,6 +202,3 @@ GET  /api/favorites/check/{songId}
 
 RevPlay demonstrates a **scalable backend architecture for a music streaming platform** built with Spring Boot and Oracle Database. The project highlights secure authentication, REST API design, and efficient data management for music streaming services. 
 
----
-
-If you want, I can also give you **3 important improvements that will make this README look more professional for recruiters (very useful for Cognizant / Java developer roles).**
