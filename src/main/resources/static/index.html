@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RevPlay — Discover, stream, and share amazing music">
+    <title>RevPlay — Music Streaming</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- ======== Header ======== -->
+        <header class="app-header" id="appHeader">
+            <div class="header-left">
+                <a href="index.html" class="logo">RevPlay</a>
+                <div class="search-bar">
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2"
+                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Search songs, artists, genres..."
+                        autocomplete="off">
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- Navigation Menu (when logged in) -->
+                <nav class="nav-menu" id="navMenu" style="display: none;">
+                    <button class="nav-link active" id="navHomeBtn" onclick="showHome()">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2"
+                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        Home
+                    </button>
+                    <button class="nav-link" id="navLibraryBtn" onclick="showLibrary()">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2"
+                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        My Library
+                    </button>
+
+                    <!-- Upload button (artist only) -->
+                    <button class="nav-link highlight" id="uploadBtn" style="display: none;"
+                        onclick="openUploadModal()">
+                        &#43; Upload
+                    </button>
+                </nav>
+
+                <!-- Login button (when not logged in) -->
+                <a href="login.html" class="btn btn-primary" id="loginLink" style="display: none;">Sign In</a>
+
+                <!-- User Profile & Sign Out (when logged in) -->
+                <div class="user-profile-bar" id="userMenu" style="display: none;" onclick="toggleUserDropdown(event)">
+                    <div class="user-info-text">
+                        <div class="user-name-text" id="dropdownName">Username</div>
+                        <div class="user-role-text" id="dropdownRole">Listener</div>
+                    </div>
+                    <div class="user-avatar-small" id="userAvatar">U</div>
+
+                    <!-- Dropdown Menu -->
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        <button class="user-dropdown-item danger" onclick="logout()">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span>Sign Out</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- ======== Main Content & Right Panel Wrapper ======== -->
+        <div class="content-wrapper" id="contentWrapper">
+            <!-- ======== Main Content ======== -->
+            <main class="main-content" id="mainContent">
+                <!-- Hero Section -->
+                <section class="hero-section" id="heroSection">
+                    <h1 class="hero-title">Welcome to <span>RevPlay</span></h1>
+                    <p class="hero-subtitle">Discover and stream your favorite music. Explore trending tracks, discover
+                        new
+                        genres, and enjoy the beats.</p>
+                </section>
+
+                <!-- Genre Filter -->
+                <section class="genre-section" id="genreSection">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Browse by Genre</h2>
+                        </div>
+                    </div>
+                    <div class="genre-pills" id="genrePills">
+                        <button class="genre-pill active" data-genre="all" onclick="filterByGenre('all')">All</button>
+                        <!-- Dynamically populated -->
+                    </div>
+                </section>
+
+                <section class="songs-section" id="topSongsSection">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title" id="topSongsTitle">&#128293; Trending Now</h2>
+                            <p class="section-subtitle">Most played tracks</p>
+                        </div>
+                    </div>
+                    <div class="song-grid" id="topSongsGrid">
+                        <div class="loading-state">
+                            <div class="loading-dots"><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- All Songs -->
+                <section class="songs-section" id="allSongsSection">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title" id="allSongsTitle">&#127925; All Songs</h2>
+                            <p class="section-subtitle">Explore the full catalog</p>
+                        </div>
+                    </div>
+                    <div class="song-grid" id="allSongsGrid">
+                        <div class="loading-state">
+                            <div class="loading-dots"><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Albums Section on Home -->
+                <section class="songs-section" id="albumsSection">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">&#128191; Albums</h2>
+                            <p class="section-subtitle">Browse albums by artists</p>
+                        </div>
+                    </div>
+                    <div class="album-grid" id="albumsGrid">
+                        <!-- Albums loaded dynamically -->
+                    </div>
+                </section>
+
+                <!-- Search Results (hidden by default) -->
+                <section class="songs-section" id="searchResultsSection" style="display: none;">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">&#128270; Search Results</h2>
+                            <p class="section-subtitle" id="searchQuery"></p>
+                        </div>
+                        <button class="see-all-link" onclick="clearSearch()">Clear Search</button>
+                    </div>
+                    <div class="song-grid" id="searchResultsGrid"></div>
+                </section>
+
+                <!-- My Library Section (hidden by default) -->
+                <section class="library-section" id="librarySection" style="display: none;">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">&#128218; My Library</h2>
+                            <p class="section-subtitle">Your favorites and playlists</p>
+                        </div>
+                    </div>
+
+                    <!-- Library Tabs -->
+                    <div class="auth-tabs" style="width: 450px; margin-bottom: var(--space-lg);">
+                        <button class="auth-tab active" id="tabFavorites" onclick="switchLibraryTab('favorites')">Liked
+                            Songs</button>
+                        <button class="auth-tab" id="tabPlaylists"
+                            onclick="switchLibraryTab('playlists')">Playlists</button>
+                        <button class="auth-tab" id="tabAlbums" onclick="switchLibraryTab('albums')"
+                            style="display: none;">My Albums</button>
+                    </div>
+
+                    <!-- Favorites Tab Content -->
+                    <div id="favoritesTab">
+                        <div class="song-grid" id="favoritesGrid">
+                            <div class="empty-state" style="grid-column: 1 / -1; margin-top: 40px;">
+                                <div class="empty-icon">&#10084;&#65039;</div>
+                                <h3>No favorites yet</h3>
+                                <p>Like songs to add them to your library</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Playlists Tab Content (hidden by default initially) -->
+                    <div id="playlistsTab" style="display: none;">
+                        <div style="margin-bottom: var(--space-lg);">
+                            <button class="btn btn-primary" onclick="openCreatePlaylistModal()">+ New Playlist</button>
+                        </div>
+                        <div class="song-grid" id="playlistsGrid">
+                            <!-- Playlists rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Albums Tab Content (hidden, artist only) -->
+                    <div id="albumsTab" style="display: none;">
+                        <div style="margin-bottom: var(--space-lg);">
+                            <button class="btn btn-primary" onclick="openCreateAlbumModal()">+ New Album</button>
+                        </div>
+                        <div class="album-grid" id="myAlbumsGrid">
+                            <!-- My albums rendered here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Playlist Details Section (hidden by default) -->
+                <section class="playlist-details-section" id="playlistDetailsSection" style="display: none;">
+                    <div class="section-header">
+                        <div>
+                            <button class="btn btn-ghost" onclick="showLibrary()"
+                                style="margin-bottom: var(--space-sm);">&#8592; Back to Library</button>
+                            <h2 class="section-title" id="playlistDetailName">Playlist Name</h2>
+                            <p class="section-subtitle" id="playlistDetailDesc">Description here</p>
+                        </div>
+                        <button class="btn btn-primary" id="addSongsToPlaylistBtn" onclick="openAddSongsModal()">+ Add
+                            Songs</button>
+                    </div>
+                    <div class="song-grid" id="playlistSongsGrid"></div>
+                </section>
+
+                <!-- Album Details Section (hidden by default) -->
+                <section class="playlist-details-section" id="albumDetailsSection" style="display: none;">
+                    <div class="section-header">
+                        <div style="display: flex; gap: var(--space-md); align-items: center;">
+                            <img id="albumDetailCover" src="" alt="Album Cover"
+                                style="width: 120px; height: 120px; object-fit: cover; border-radius: var(--radius-md); display: none;">
+                            <div>
+                                <button class="btn btn-ghost" onclick="showLibrary()"
+                                    style="margin-bottom: var(--space-sm);">&#8592; Back to Library</button>
+                                <h2 class="section-title" id="albumDetailName">Album Name</h2>
+                                <p class="section-subtitle" id="albumDetailDesc">Description here</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary" id="uploadSongToAlbumBtn"
+                                onclick="openUploadModal(window._currentAlbum)">&#9654; Upload Song</button>
+                            <button class="btn btn-ghost" id="addSongsToAlbumBtn" onclick="openAddSongsToAlbumModal()">+
+                                Add Existing</button>
+                            <button class="btn btn-ghost" id="deleteAlbumBtn" onclick="deleteCurrentAlbum()"
+                                style="color: #f87171;">Delete Album</button>
+                        </div>
+                    </div>
+                    <div class="song-grid" id="albumSongsGrid"></div>
+                </section>
+            </main>
+
+            <!-- ======== Right "Now Playing" Panel ======== -->
+            <aside class="right-panel" id="rightPanel" style="display: none;">
+                <div class="right-panel-header">
+                    <h3>Now Playing</h3>
+                    <button class="btn-icon" onclick="closeRightPanel()" title="Close Panel">&#10005;</button>
+                </div>
+
+                <div class="right-panel-cover" id="rightPanelCover">
+                    <img id="rightPanelImg" src="" alt="Cover Art">
+                </div>
+
+                <div class="right-panel-track-info">
+                    <h3 id="rightPanelTitle">Song Title</h3>
+                    <p id="rightPanelArtist">Artist Name</p>
+                </div>
+
+                <div class="right-panel-about">
+                    <div class="about-header">
+                        <h4>About the artist</h4>
+                    </div>
+                    <div class="about-content">
+                        <div class="about-avatar" id="rightPanelArtistAvatar">U</div>
+                        <h5 id="rightPanelAboutArtist">Artist Name</h5>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+    <!-- ======== Bottom Player Bar ======== -->
+    <div class="player-bar" id="playerBar">
+        <div class="player-info">
+            <div class="player-cover" id="playerCover">
+                <div class="cover-placeholder-mini">&#127925;</div>
+            </div>
+            <div class="player-track-info">
+                <div class="player-track-title" id="playerTitle">No song selected</div>
+                <div class="player-track-artist" id="playerArtist">—</div>
+            </div>
+        </div>
+
+        <div class="player-controls">
+            <div class="player-buttons">
+                <button class="player-btn" id="prevBtn" onclick="playPrev()" title="Previous">&#9198;</button>
+                <button class="player-btn-play" id="playPauseBtn" onclick="togglePlayPause()"
+                    title="Play">&#9654;</button>
+                <button class="player-btn" id="nextBtn" onclick="playNext()" title="Next">&#9197;</button>
+            </div>
+            <div class="player-progress">
+                <span class="player-time" id="currentTime">0:00</span>
+                <div class="progress-bar" id="progressBar" onclick="seekTo(event)">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="player-time" id="totalTime">0:00</span>
+            </div>
+        </div>
+
+        <div class="player-volume">
+            <button class="player-btn" id="volumeBtn" onclick="toggleMute()" title="Volume">&#128266;</button>
+            <div class="volume-bar" id="volumeBar" onclick="setVolume(event)">
+                <div class="volume-fill" id="volumeFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== Upload Modal ======== -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Upload a Song</h2>
+                <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+            </div>
+
+            <form id="uploadForm" onsubmit="handleUpload(event)">
+                <input type="hidden" id="uploadAlbumId" value="">
+                <div id="uploadAlbumInfo"
+                    style="display: none; background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: var(--space-md); font-size: 0.9rem; color: var(--text-secondary);">
+                    Uploading to album: <strong id="uploadAlbumName" style="color: var(--text-primary);"></strong>
+                </div>
+                <!-- Audio File -->
+                <div class="file-drop-zone" id="audioDropZone"
+                    onclick="document.getElementById('audioFileInput').click()">
+                    <div class="drop-icon">&#127925;</div>
+                    <div class="drop-text">Click or drag to upload <strong>audio file</strong></div>
+                    <div class="file-selected" id="audioFileName"></div>
+                </div>
+                <input type="file" id="audioFileInput" accept="audio/*" style="display:none"
+                    onchange="handleFileSelect(this, 'audioFileName')" required>
+
+                <!-- Cover Art -->
+                <div class="file-drop-zone" id="coverDropZone"
+                    onclick="document.getElementById('coverFileInput').click()" style="margin-top: var(--space-md);">
+                    <div class="drop-icon">&#128247;</div>
+                    <div class="drop-text">Click or drag to upload <strong>cover art</strong> (optional)</div>
+                    <div class="file-selected" id="coverFileName"></div>
+                </div>
+                <input type="file" id="coverFileInput" accept="image/*" style="display:none"
+                    onchange="handleFileSelect(this, 'coverFileName')">
+
+                <!-- Song Details -->
+                <div style="display: flex; flex-direction: column; gap: var(--space-md); margin-top: var(--space-lg);">
+                    <div class="form-group">
+                        <label for="songTitle">Song Title</label>
+                        <input type="text" id="songTitle" class="form-input" placeholder="Enter song title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="songGenre">Genre</label>
+                        <input type="text" id="songGenre" class="form-input" placeholder="e.g., Pop, Rock, Hip-Hop">
+                    </div>
+                    <div class="form-group">
+                        <label for="songVisibility">Visibility</label>
+                        <select id="songVisibility" class="form-select">
+                            <option value="PUBLIC">Public</option>
+                            <option value="UNLISTED">Unlisted</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="error-message" id="uploadError" style="margin-top: var(--space-md);"></div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="uploadSubmitBtn"
+                    style="margin-top: var(--space-lg);">
+                    <span class="btn-text">Upload Song</span>
+                    <span class="loading-spinner"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======== Create Playlist Modal ======== -->
+    <div class="modal-overlay" id="createPlaylistModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Playlist</h2>
+                <button class="modal-close" onclick="closeCreatePlaylistModal()">&times;</button>
+            </div>
+            <form id="createPlaylistForm" onsubmit="handleCreatePlaylist(event)">
+                <div class="form-group" style="margin-bottom: var(--space-md);">
+                    <label for="playlistName">Name</label>
+                    <input type="text" id="playlistName" class="form-input" placeholder="Playlist Name" required>
+                </div>
+                <div class="form-group" style="margin-bottom: var(--space-md);">
+                    <label for="playlistDesc">Description</label>
+                    <textarea id="playlistDesc" class="form-input" placeholder="Optional description"></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom: var(--space-md);">
+                    <label>
+                        <input type="checkbox" id="playlistPublic" checked> Public Playlist
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" id="createPlaylistBtn">
+                    Create
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======== Add Songs Modal ======== -->
+    <div class="modal-overlay" id="addSongsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Add to Playlist</h2>
+                <button class="modal-close" onclick="closeAddSongsModal()">&times;</button>
+            </div>
+            <div class="search-bar" style="width: 100%; margin-bottom: var(--space-md);">
+                <span class="search-icon">&#128269;</span>
+                <input type="text" id="addSongSearchInput" placeholder="Search songs..." autocomplete="off">
+            </div>
+            <div id="addSongsResults" style="max-height: 400px; overflow-y: auto;">
+                <!-- Search results for adding to playlist -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== Create Album Modal ======== -->
+    <div class="modal-overlay" id="createAlbumModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Album</h2>
+                <button class="modal-close" onclick="closeCreateAlbumModal()">&times;</button>
+            </div>
+            <form id="createAlbumForm" onsubmit="handleCreateAlbum(event)">
+                <div class="form-group" style="margin-bottom: var(--space-md);">
+                    <label for="albumName">Album Name</label>
+                    <input type="text" id="albumName" class="form-input" placeholder="My Album" required>
+                </div>
+                <div class="form-group" style="margin-bottom: var(--space-md);">
+                    <label for="albumDesc">Description</label>
+                    <textarea id="albumDesc" class="form-input" placeholder="Optional description"></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom: var(--space-md);">
+                    <label for="albumReleaseDate">Release Date</label>
+                    <input type="date" id="albumReleaseDate" class="form-input">
+                </div>
+
+                <!-- Album Cover Art Upload -->
+                <div class="form-group" style="margin-bottom: var(--space-lg);">
+                    <label>Cover Art (Optional)</label>
+                    <div class="file-drop-zone" id="albumCoverDropZone"
+                        onclick="document.getElementById('albumCoverFileInput').click()">
+                        <div class="drop-icon">&#128247;</div>
+                        <div class="drop-text">Click or drag to upload <strong>album cover</strong></div>
+                        <div class="file-selected" id="albumCoverFileName"></div>
+                    </div>
+                    <input type="file" id="albumCoverFileInput" accept="image/*" style="display:none"
+                        onchange="handleFileSelect(this, 'albumCoverFileName')">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="createAlbumBtn">
+                    Create Album
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======== Add Songs to Album Modal ======== -->
+    <div class="modal-overlay" id="addSongsToAlbumModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Songs to Album</h2>
+                <button class="modal-close" onclick="closeAddSongsToAlbumModal()">&times;</button>
+            </div>
+            <div id="addSongsToAlbumResults" style="max-height: 400px; overflow-y: auto;">
+                <!-- Artist's songs listed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== Toast Container ======== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Audio Element (hidden) -->
+    <audio id="audioElement" preload="auto"></audio>
+
+    <script src="js/api.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
