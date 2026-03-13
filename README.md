@@ -1,7 +1,4 @@
 # P2-RevPlay
-
-Here is a **clean GitHub README.md** you can directly paste into your repository. I simplified and structured it the way recruiters and companies expect on GitHub while keeping the important parts from your documentation.
-
 ---
 
 # RevPlay – Music Streaming Backend
